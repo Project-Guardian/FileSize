@@ -2,6 +2,17 @@ import os
 import re
 import argparse
 
+def get_folder_size(path='.'):
+    total_size = 0
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.is_file():
+                total_size += entry.stat().st_size
+            elif entry.is_dir():
+                total_size += get_folder_size(entry.path)
+    return total_size
+
+
 def add_folder_size(directory, position='trailing'):
     # Loop through each folder in the specified directory
     for folder in os.listdir(directory):
@@ -9,7 +20,8 @@ def add_folder_size(directory, position='trailing'):
         # Only process subdirectories
         if os.path.isdir(folder_path):
             # Calculate the size of the folder
-            folder_size = sum(os.path.getsize(os.path.join(folder_path, file)) for file in os.listdir(folder_path))
+            #folder_size = sum(os.path.getsize(os.path.join(folder_path, file)) for file in os.listdir(folder_path))
+            folder_size = get_folder_size(folder_path)
             size_str = get_folder_size_str(folder_size)
 
             # Regular expressions for detecting if the folder name has a leading or trailing size
